@@ -53,6 +53,29 @@ builder.Services.AddSingleton<IMqttBinDataService>(sp =>
 // The hosted service will resolve the IMqttBinDataService from the DI container and manage its lifecycle.
 builder.Services.AddHostedService<MqttBinDataHostedService>();
 
+// Configure and register the MQTT House Data Service.
+// We register it as a Singleton because we want a single instance of the MQTT client
+// to run throughout the application's lifetime, managing the connection and received data.
+// We retrieve configuration values from appsettings.json using builder.Configuration.
+var houseMqttBrokerAddress = builder.Configuration["MqttHouse:BrokerAddress"] ?? "test.mosquitto.org"; // Get broker address from config, default if not found
+var houseMqttPort = builder.Configuration.GetValue<int>("MqttHouse:Port", 1883); // Get port from config, default if not found
+var houseMqttTopic = builder.Configuration["MqttHouse:Topic"] ?? "suburb/model/igention/houses"; // Get topic from config, default if not found
+
+Console.WriteLine($"Configuring MqttHouseDataService with Broker: {houseMqttBrokerAddress}:{houseMqttPort}, Topic: {houseMqttTopic}");
+
+// Register the MqttHouseDataService implementation for the IMqttHouseDataService interface.
+// When a class requests an IMqttHouseDataService, the DI container will provide a single instance
+// of MqttHouseDataService, created with the specified configuration values.
+builder.Services.AddSingleton<IMqttHouseDataService>(sp =>
+    new MqttHouseDataService(houseMqttBrokerAddress, houseMqttPort, houseMqttTopic));
+
+// Register the MqttHouseDataHostedService.
+// IHostedService implementations are automatically started and stopped by the .NET host
+// when the application starts and stops. This is the standard and recommended way to run
+// long-running background tasks like an MQTT client listener in ASP.NET Core/ .NET applications.
+// The hosted service will resolve the IMqttHouseDataService from the DI container and manage its lifecycle.
+builder.Services.AddHostedService<MqttHouseDataHostedService>();
+
 
 // --- Build the Application ---
 // Build the WebApplication instance from the configured builder.
@@ -137,3 +160,46 @@ public class MqttBinDataHostedService : IHostedService
         return _mqttBinDataService.StopAsync();
     }
 }
+
+public class MqttHouseDataHostedService : IHostedService
+{
+    // The IMqttHouseDataService instance is injected here by the DI container.
+    private readonly IMqttHouseDataService _mqttHouseDataService;
+
+    /// <summary>
+    /// Initializes a new instance of the MqttHouseDataHostedService.
+    /// </summary>
+    /// <param name="mqttHouseDataService">The MQTT house data service instance to manage (injected by DI).</param>
+    public MqttHouseDataHostedService(IMqttHouseDataService mqttHouseDataService)
+    {
+        _mqttHouseDataService = mqttHouseDataService;
+    }
+
+    /// <summary>
+    /// Called by the .NET host when the application is starting.
+    /// This method is responsible for starting the underlying MQTT house data service.
+    /// </summary>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
+    /// <returns>A Task representing the asynchronous operation of starting the service.</returns>
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        Console.WriteLine("MqttHouseDataHostedService is starting the MQTT House Data Service.");
+        // Call the StartAsync method of the underlying MQTT service implementation.
+        return _mqttHouseDataService.StartAsync();
+    }
+
+    /// <summary>
+    /// Called by the .NET host when the application is stopping.
+
+    /// This method is responsible for stopping the underlying MQTT house data service.
+    /// </summary>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
+    /// <returns>A Task representing the asynchronous operation of stopping the service.</returns>
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        Console.WriteLine("MqttHouseDataHostedService is stopping the MQTT House Data Service.");
+        // Call the StopAsync method of the underlying MQTT service implementation.
+        return _mqttHouseDataService.StopAsync();
+    }
+}
+
