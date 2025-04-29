@@ -71,11 +71,18 @@ namespace NeuroDustify.Infrastructure.Mqtt
                 }
             };
 
+            // _mqttClient.ApplicationMessageReceivedAsync += async e =>
+            // {
+            //     var payload = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment.ToArray());
+            //     Console.WriteLine($"Message received on topic {e.ApplicationMessage.Topic}: {payload}");
+            //     await Task.Run(() => ProcessReceivedMessage(payload));
+            // };
+
             _mqttClient.ApplicationMessageReceivedAsync += async e =>
             {
-                // var payload = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment.ToArray());
-                // Console.WriteLine($"Message received on topic {e.ApplicationMessage.Topic}: {payload}");
-                // await Task.Run(() => ProcessReceivedMessage(payload));
+                var payload = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
+                Console.WriteLine($"Message received on topic {e.ApplicationMessage.Topic}: {payload}");
+                await Task.Run(() => ProcessReceivedMessage(payload));
             };
         }
 
