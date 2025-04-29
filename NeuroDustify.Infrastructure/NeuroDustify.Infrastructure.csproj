@@ -5,7 +5,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MQTTnet" Version="5.0.1.1416" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.4" />
+    <PackageReference Include="MQTTnet" Version="4.1.0.247" />
+    <PackageReference Include="MQTTnet.Extensions.ManagedClient" Version="4.0.2.221" />
   </ItemGroup>
 
   <PropertyGroup>
