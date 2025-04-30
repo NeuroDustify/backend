@@ -1,13 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization; // Required for [JsonPropertyName] attribute
 
 namespace NeuroDustify.Domain.Entities
 {
-    public class Location
-    {
-        public double Latitude { get; set; }
-        public double Longitude { get; set; }
-    }
 
     public class DrivewayMessage
     {
@@ -36,7 +32,7 @@ namespace NeuroDustify.Domain.Entities
         public List<StreetMessage> Streets { get; set; }
     }
 
-        public class SuburbDataMessage
+    public class SuburbDataMessage
     {
         public string SuburbId { get; set; } // Example: "suburb_123"
         public string Name { get; set; }
@@ -53,8 +49,8 @@ namespace NeuroDustify.Domain.Entities
 
     public class HouseData
     {
-         public string HouseId { get; set; }
-         public string Address { get; set; }
-         public Location HouseLocation { get; set; }
+        public string HouseId { get; set; }
+        public string Address { get; set; }
+        public Location HouseLocation { get; set; }
     }
 }
