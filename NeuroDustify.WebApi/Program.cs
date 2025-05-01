@@ -76,6 +76,74 @@ builder.Services.AddSingleton<IMqttHouseDataService>(sp =>
 // The hosted service will resolve the IMqttHouseDataService from the DI container and manage its lifecycle.
 builder.Services.AddHostedService<MqttHouseDataHostedService>();
 
+// Configure and register the MQTT Driveway Service.
+// We register it as a Singleton because we want a single instance of the MQTT client
+// to run throughout the application's lifetime, managing the connection and received data.
+// We retrieve configuration values from appsettings.json using builder.Configuration.
+var drivewayMqttBrokerAddress = builder.Configuration["MqttDriveway:BrokerAddress"] ?? "test.mosquitto.org"; // Get broker address from config, default if not found
+var drivewayMqttPort = builder.Configuration.GetValue<int>("MqttDriveway:Port", 1883); // Get port from config, default if not found
+var drivewayMqttTopic = builder.Configuration["MqttDriveway:Topic"] ?? "suburb/model/igention/driveways"; // Get topic from config, default if not found
+
+Console.WriteLine($"Configuring MqttDrivewayService with Broker: {drivewayMqttBrokerAddress}:{drivewayMqttPort}, Topic: {drivewayMqttTopic}");
+
+// Register the MqttDrivewayDataService implementation for the IMqttDrivewayDataService interface.
+// When a class requests an IMqttDrivewayDataService, the DI container will provide a single instance
+// of MqttBinDataService, created with the specified configuration values.
+builder.Services.AddSingleton<IMqttDrivewayDataService>(sp =>
+    new MqttDrivewayDataService(drivewayMqttBrokerAddress, drivewayMqttPort, drivewayMqttTopic));
+
+// Register the MqttDrivewayHostedService.
+// IHostedService implementations are automatically started and stopped by the .NET host
+// when the application starts and stops. This is the standard and recommended way to run
+// long-running background tasks like an MQTT client listener in ASP.NET Core/ .NET applications.
+// The hosted service will resolve the IMqttDrivewayDataService from the DI container and manage its lifecycle.
+builder.Services.AddHostedService<MqttDrivewayDataHostedService>();
+
+// Configure and register the MQTT Driveway Service.
+// We register it as a Singleton because we want a single instance of the MQTT client
+// to run throughout the application's lifetime, managing the connection and received data.
+// We retrieve configuration values from appsettings.json using builder.Configuration.
+var streetMqttBrokerAddress = builder.Configuration["MqttStreet:BrokerAddress"] ?? "test.mosquitto.org"; // Get broker address from config, default if not found
+var streetMqttPort = builder.Configuration.GetValue<int>("MqttStreet:Port", 1883); // Get port from config, default if not found
+var streetMqttTopic = builder.Configuration["MqttStreet:Topic"] ?? "suburb/model/igention/streets"; // Get topic from config, default if not found
+
+Console.WriteLine($"Configuring MqttStreetDataService with Broker: {streetMqttBrokerAddress}:{streetMqttPort}, Topic: {streetMqttTopic}");
+
+// Register the MqttStreetDataService implementation for the IMqttStreetDataService interface.
+// When a class requests an IMqttStreetDataService, the DI container will provide a single instance
+// of MqttBinDataService, created with the specified configuration values.
+builder.Services.AddSingleton<IMqttStreetDataService>(sp =>
+    new MqttStreetDataService(streetMqttBrokerAddress, streetMqttPort, streetMqttTopic));
+
+// Register the MqttStreetHostedService.
+// IHostedService implementations are automatically started and stopped by the .NET host
+// when the application starts and stops. This is the standard and recommended way to run
+// long-running background tasks like an MQTT client listener in ASP.NET Core/ .NET applications.
+// The hosted service will resolve the IMqttBinDataService from the DI container and manage its lifecycle.
+builder.Services.AddHostedService<MqttStreetDataHostedService>();
+
+// Configure and register the MQTT Suburb Service.
+// We register it as a Singleton because we want a single instance of the MQTT client
+// to run throughout the application's lifetime, managing the connection and received data.
+// We retrieve configuration values from appsettings.json using builder.Configuration.
+var suburbMqttBrokerAddress = builder.Configuration["MqttSuburb:BrokerAddress"] ?? "test.mosquitto.org";
+var suburbMqttPort = builder.Configuration.GetValue<int>("MqttSuburb:Port", 1883);
+var suburbMqttTopic = builder.Configuration["MqttSuburb:Topic"] ?? "suburb/model/igention/suburb";
+
+Console.WriteLine($"Configuring MqttSuburbDataService with Broker: {suburbMqttBrokerAddress}:{suburbMqttPort}, Topic: {suburbMqttTopic}");
+
+// Register the MqttSuburbDataService implementation for the IMqttSuburbDataService interface.
+// When a class requests an IMqttSuburbDataService, the DI container will provide a single instance
+// of MqttSuburbDataService, created with the specified configuration values.
+builder.Services.AddSingleton<IMqttSuburbDataService>(sp =>
+    new MqttSuburbDataService(suburbMqttBrokerAddress, suburbMqttPort, suburbMqttTopic));
+
+// Register the MqttSuburbHostedService.
+// IHostedService implementations are automatically started and stopped by the .NET host
+// when the application starts and stops. This is the standard and recommended way to run
+// long-running background tasks like an MQTT client listener in ASP.NET Core/ .NET applications.
+// The hosted service will resolve the IMqttSuburbDataService from the DI container and manage its lifecycle.
+builder.Services.AddHostedService<MqttSuburbDataHostedService>();
 
 // --- Build the Application ---
 // Build the WebApplication instance from the configured builder.
@@ -161,18 +229,18 @@ public class MqttBinDataHostedService : IHostedService
     }
 }
 
-public class MqttHouseDataHostedService : IHostedService
+public class MqttDrivewayDataHostedService : IHostedService
 {
     // The IMqttHouseDataService instance is injected here by the DI container.
-    private readonly IMqttHouseDataService _mqttHouseDataService;
+    private readonly IMqttDrivewayDataService _mqttDrivewayDataService;
 
     /// <summary>
     /// Initializes a new instance of the MqttHouseDataHostedService.
     /// </summary>
-    /// <param name="mqttHouseDataService">The MQTT house data service instance to manage (injected by DI).</param>
-    public MqttHouseDataHostedService(IMqttHouseDataService mqttHouseDataService)
+    /// <param name="mqttDrivewayDataService">The MQTT house data service instance to manage (injected by DI).</param>
+    public MqttDrivewayDataHostedService(IMqttDrivewayDataService mqttDrivewayDataService)
     {
-        _mqttHouseDataService = mqttHouseDataService;
+        _mqttDrivewayDataService = mqttDrivewayDataService;
     }
 
     /// <summary>
@@ -183,9 +251,9 @@ public class MqttHouseDataHostedService : IHostedService
     /// <returns>A Task representing the asynchronous operation of starting the service.</returns>
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        Console.WriteLine("MqttHouseDataHostedService is starting the MQTT House Data Service.");
+        Console.WriteLine("MqttDrivewayDataHostedService is starting the MQTT House Data Service.");
         // Call the StartAsync method of the underlying MQTT service implementation.
-        return _mqttHouseDataService.StartAsync();
+        return _mqttDrivewayDataService.StartAsync();
     }
 
     /// <summary>
@@ -197,9 +265,91 @@ public class MqttHouseDataHostedService : IHostedService
     /// <returns>A Task representing the asynchronous operation of stopping the service.</returns>
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        Console.WriteLine("MqttHouseDataHostedService is stopping the MQTT House Data Service.");
+        Console.WriteLine("MqttDrivewayDataHostedService is stopping the MQTT House Data Service.");
         // Call the StopAsync method of the underlying MQTT service implementation.
-        return _mqttHouseDataService.StopAsync();
+        return _mqttDrivewayDataService.StopAsync();
     }
 }
 
+public class MqttStreetDataHostedService : IHostedService
+{
+    // The IMqttHouseDataService instance is injected here by the DI container.
+    private readonly IMqttStreetDataService _mqttStreetDataService;
+
+    /// <summary>
+    /// Initializes a new instance of the MqttHouseDataHostedService.
+    /// </summary>
+    /// <param name="mqttStreetDataService">The MQTT house data service instance to manage (injected by DI).</param>
+    public MqttStreetDataHostedService(IMqttStreetDataService mqttStreetDataService)
+    {
+        _mqttStreetDataService = mqttStreetDataService;
+    }
+
+    /// <summary>
+    /// Called by the .NET host when the application is starting.
+    /// This method is responsible for starting the underlying MQTT house data service.
+    /// </summary>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
+    /// <returns>A Task representing the asynchronous operation of starting the service.</returns>
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        Console.WriteLine("MqttStreetDataHostedService is starting the MQTT House Data Service.");
+        // Call the StartAsync method of the underlying MQTT service implementation.
+        return _mqttStreetDataService.StartAsync();
+    }
+
+    /// <summary>
+    /// Called by the .NET host when the application is stopping.
+
+    /// This method is responsible for stopping the underlying MQTT house data service.
+    /// </summary>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
+    /// <returns>A Task representing the asynchronous operation of stopping the service.</returns>
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        Console.WriteLine("MqttStreetDataHostedService is stopping the MQTT House Data Service.");
+        // Call the StopAsync method of the underlying MQTT service implementation.
+        return _mqttStreetDataService.StopAsync();
+    }
+}
+
+public class MqttSuburbDataHostedService : IHostedService
+{
+    // The IMqttSuburbDataService instance is injected here by the DI container.
+    private readonly IMqttSuburbDataService _mqttSuburbDataService;
+
+    /// <summary>
+    /// Initializes a new instance of the MqttSuburbDataHostedService.
+    /// </summary>
+    /// <param name="mqttSuburbDataService">The MQTT suburb data service instance to manage (injected by DI).</param>
+    public MqttSuburbDataHostedService(IMqttSuburbDataService mqttSuburbDataService)
+    {
+        _mqttSuburbDataService = mqttSuburbDataService;
+    }
+
+    /// <summary>
+    /// Called by the .NET host when the application is starting.
+    /// This method is responsible for starting the underlying MQTT suburb data service.
+    /// </summary>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
+    /// <returns>A Task representing the asynchronous operation of starting the service.</returns>
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        Console.WriteLine("MqttSuburbDataHostedService is starting the MQTT Suburb Data Service.");
+        // Call the StartAsync method of the underlying MQTT service implementation.
+        return _mqttSuburbDataService.StartAsync();
+    }
+
+    /// <summary>
+    /// Called by the .NET host when the application is stopping.
+    /// This method is responsible for stopping the underlying MQTT suburb data service.
+    /// </summary>
+    /// <param name="cancellationToken">A token to signal cancellation.</param>
+    /// <returns>A Task representing the asynchronous operation of stopping the service.</returns>
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        Console.WriteLine("MqttSuburbDataHostedService is stopping the MQTT Suburb Data Service.");
+        // Call the StopAsync method of the underlying MQTT service implementation.
+        return _mqttSuburbDataService.StopAsync();
+    }
+}

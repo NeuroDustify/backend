@@ -1,32 +1,37 @@
-// using NeuroDustify.Domain.Entities; // Reference to the Domain layer for the entity
-// using System.Threading.Tasks; // Used for asynchronous operations
+// NeuroDustify.Application/Interfaces/IMqttSuburbDataService.cs
+// Defines the interface for a service that handles house data received via MQTT.
+// This belongs in the Application layer.
 
-// namespace NeuroDustify.Application.Interfaces
-// {
-//     /// <summary>
-//     /// Defines the contract for a service responsible for receiving and managing
-//     /// suburb data messages from an MQTT broker.
-//     /// </summary>
-//     public interface IMqttSuburbDataService
-//     {
-//         /// <summary>
-//         /// Starts the MQTT client, connects to the broker, and subscribes to the suburb
-//         /// data topic.  This should run as a background task.
-//         /// </summary>
-//         /// <returns>A Task representing the asynchronous operation.</returns>
-//         Task StartAsync();
+using NeuroDustify.Domain.Entities; // Reference to the Domain layer for the entity
+using System.Collections.Generic;
+using System.Threading.Tasks; // Used for asynchronous operations
 
-//         /// <summary>
-//         /// Stops the MQTT client and disconnects from the broker.
-//         /// </summary>
-//         /// <returns>A Task representing the asynchronous operation.</returns>
-//         Task StopAsync();
+namespace NeuroDustify.Application.Interfaces
+{
+    /// <Summary>
+    /// Defines the contract for a service respinsible for recieving and managing
+    /// street data messages from an MQTT broker.
+    /// </summary>
+    public interface IMqttSuburbDataService 
+    {
+        /// <summary>
+        /// Starts the MQTT client and connects to the broker, initiating the subscription
+        /// to the street data topic. This should run as a background task.
+        /// </summary>
+        /// <retrns>A Task representing the asynchronous oeration.</returns>
+        Task StartAsync();
 
-//         /// <summary>
-//         /// Retrieves the latest suburb data message that has been received by the service.
-//         /// Since suburb data is published as a single message, we return a single object.
-//         /// </summary>
-//         /// <returns>The SuburbDataMessage object, or null if no message has been received.</returns>
-//         SuburbDataMessage? GetLatestSuburbData(); // Changed return type to SuburbDataMessage?
-//     }
-// }
+        /// <summary> 
+        /// Stops the MQTT Client and disconnects from the broker.
+        /// </summary>
+        /// <returns>A Task representing the asynchronous operations.</returns>
+        Task StopAsync();
+
+        /// <summary>
+        /// Retrieves the lates collection of the Suburb data messages that have been recieved
+        /// by the service.
+        /// </summary>
+        /// <returns>A list of SuburbDataMessage objects.</returns>
+        List<SuburbDataMessage> GetLatestMessages();
+    }   
+}

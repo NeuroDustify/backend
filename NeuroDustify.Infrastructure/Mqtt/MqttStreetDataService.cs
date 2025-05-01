@@ -1,11 +1,11 @@
-// NeuroDustify.Infrastructure/Mqtt/MqttSuburbDataService.cs
-// Provides a concrete implementation of IMqttSuburbDataService using the MQTTnet library.
-// Handles MQTT connection, subscription, and processing of suburb data messages.
+// NeuroDustify.Infrastructure/Mqtt/MqttStreetDataService.cs
+// Provides a concrete implementation of IMqttStreetDataService using the MQTTnet library.
+// Handles MQTT connection, subscription, and processing of street data messages.
 
 using MQTTnet; // Core MQTTnet library
 using MQTTnet.Client; // MQTTnet client specific classes
 using NeuroDustify.Application.Interfaces; // Reference to the Application layer interface
-using NeuroDustify.Domain.Entities; // Reference to the Domain layer entities (SuburbDataMessage)
+using NeuroDustify.Domain.Entities; // Reference to the Domain layer entities (StreetDataMessage)
 using System; // For Guid, Console, Exception
 using System.Collections.Concurrent; // For ConcurrentBag
 using System.Collections.Generic; // For List
@@ -19,20 +19,20 @@ using Microsoft.Extensions.Hosting; // For IHostedService and related types
 namespace NeuroDustify.Infrastructure.Mqtt
 {
     /// <summary>
-    /// Concrete implementation of the IMqttSuburbDataService using MQTTnet.
-    /// Connects to an MQTT broker, subscribes to a suburb data topic,
-    /// and stores received SuburbDataMessage objects.
+    /// Concrete implementation of the IMqttStreetDataService using MQTTnet.
+    /// Connects to an MQTT broker, subscribes to a street data topic,
+    /// and stores received StreetDataMessage objects.
     /// </summary>
-    public class MqttSuburbDataService : IMqttSuburbDataService, IDisposable
+    public class MqttStreetDataService : IMqttStreetDataService, IDisposable
     {
         private IMqttClient _mqttClient;
         private MqttClientOptions _mqttClientOptions;
-        private readonly ConcurrentBag<SuburbDataMessage> _receivedMessages = new ConcurrentBag<SuburbDataMessage>();
+        private readonly ConcurrentBag<StreetDataMessage> _receivedMessages = new ConcurrentBag<StreetDataMessage>();
         private readonly string _brokerAddress;
         private readonly int _port;
         private readonly string _topic;
 
-        public MqttSuburbDataService(string brokerAddress, int port, string topic)
+        public MqttStreetDataService(string brokerAddress, int port, string topic)
         {
             if (string.IsNullOrWhiteSpace(brokerAddress))
                 throw new ArgumentException("Broker address cannot be null or whitespace.", nameof(brokerAddress));
@@ -51,7 +51,7 @@ namespace NeuroDustify.Infrastructure.Mqtt
             ConfigureEventHandlers();
 
             _mqttClientOptions = new MqttClientOptionsBuilder()
-                .WithClientId($"NeuroDustify_Suburb_Backend_{Guid.NewGuid()}")
+                .WithClientId($"NeuroDustify_Street_Backend_{Guid.NewGuid()}")
                 .WithTcpServer(_brokerAddress, _port)
                 .WithCleanSession()
                 .Build();
@@ -91,23 +91,23 @@ namespace NeuroDustify.Infrastructure.Mqtt
         {
             try
             {
-                Console.WriteLine($"Attempting to connect MQTT Suburb client to broker at {_brokerAddress}:{_port}...");
+                Console.WriteLine($"Attempting to connect MQTT Street client to broker at {_brokerAddress}:{_port}...");
                 await _mqttClient.ConnectAsync(_mqttClientOptions, CancellationToken.None);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Initial MQTT Suburb Connection failed: {ex.Message}");
+                Console.WriteLine($"Initial MQTT Street Connection failed: {ex.Message}");
             }
         }
 
         public async Task StopAsync()
         {
-            Console.WriteLine("Stopping MQTT Suburb Data Service...");
+            Console.WriteLine("Stopping MQTT Street Data Service...");
             if (_mqttClient.IsConnected)
             {
                 await _mqttClient.DisconnectAsync();
             }
-            Console.WriteLine("MQTT Suburb Client stopped.");
+            Console.WriteLine("MQTT Street Client stopped.");
         }
 
         private async Task SubscribeToTopic(string topic)
@@ -122,16 +122,16 @@ namespace NeuroDustify.Infrastructure.Mqtt
                             .WithQualityOfServiceLevel(MQTTnet.Protocol.MqttQualityOfServiceLevel.AtLeastOnce)
                             .Build());
 
-                    Console.WriteLine($"Subscribed MQTT Suburb client to topic: {topic}");
+                    Console.WriteLine($"Subscribed MQTT Street client to topic: {topic}");
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error subscribing MQTT Suburb client to topic {topic}: {ex.Message}");
+                    Console.WriteLine($"Error subscribing MQTT Street client to topic {topic}: {ex.Message}");
                 }
             }
             else
             {
-                Console.WriteLine("MQTT Suburb Client not connected. Cannot subscribe to topic.");
+                Console.WriteLine("MQTT Street Client not connected. Cannot subscribe to topic.");
             }
         }
 
@@ -141,29 +141,29 @@ namespace NeuroDustify.Infrastructure.Mqtt
             try
             {
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                var suburbData = JsonSerializer.Deserialize<SuburbDataMessage>(payload, options);
+                var streetData = JsonSerializer.Deserialize<StreetDataMessage>(payload, options);
 
-                if (suburbData != null)
+                if (streetData != null)
                 {
-                    _receivedMessages.Add(suburbData);
-                    Console.WriteLine($"Successfully processed and stored Suburb Data for Suburb ID: {suburbData.SuburbId}");
+                    _receivedMessages.Add(streetData);
+                    Console.WriteLine($"Successfully processed and stored Street Data for Street ID: {streetData.StreetId}");
                 }
                 else
                 {
-                    Console.WriteLine("Suburb Data Deserialization returned null. Payload: " + payload);
+                    Console.WriteLine("Street Data Deserialization returned null. Payload: " + payload);
                 }
             }
             catch (JsonException jex)
             {
-                Console.WriteLine($"Suburb Data JSON Deserialization error: {jex.Message}. Payload: {payload}");
+                Console.WriteLine($"Street Data JSON Deserialization error: {jex.Message}. Payload: {payload}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"General error processing Suburb Data message: {ex.Message}. Payload: {payload}");
+                Console.WriteLine($"General error processing Street Data message: {ex.Message}. Payload: {payload}");
             }
         }
 
-        public List<SuburbDataMessage> GetLatestMessages()
+        public List<StreetDataMessage> GetLatestMessages()
         {
             return _receivedMessages.ToList();
         }
@@ -171,29 +171,29 @@ namespace NeuroDustify.Infrastructure.Mqtt
         public void Dispose()
         {
             _mqttClient?.Dispose();
-            Console.WriteLine("MqttSuburbDataService disposed.");
+            Console.WriteLine("MqttStreetDataService disposed.");
         }
     }
 
-    public class MqttSuburbDataHostedService : IHostedService
+    public class MqttStreetDataHostedService : IHostedService
     {
-        private readonly IMqttSuburbDataService _mqttSuburbDataService;
+        private readonly IMqttStreetDataService _mqttStreetDataService;
 
-        public MqttSuburbDataHostedService(IMqttSuburbDataService mqttSuburbDataService)
+        public MqttStreetDataHostedService(IMqttStreetDataService mqttStreetDataService)
         {
-            _mqttSuburbDataService = mqttSuburbDataService;
+            _mqttStreetDataService = mqttStreetDataService;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            Console.WriteLine("MqttSuburbDataHostedService is starting the MQTT Suburb Data Service.");
-            return _mqttSuburbDataService.StartAsync();
+            Console.WriteLine("MqttStreetDataHostedService is starting the MQTT Street Data Service.");
+            return _mqttStreetDataService.StartAsync();
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            Console.WriteLine("MqttSuburbDataHostedService is stopping the MQTT Suburb Data Service.");
-            return _mqttSuburbDataService.StopAsync();
+            Console.WriteLine("MqttStreetDataHostedService is stopping the MQTT Street Data Service.");
+            return _mqttStreetDataService.StopAsync();
         }
     }
 }

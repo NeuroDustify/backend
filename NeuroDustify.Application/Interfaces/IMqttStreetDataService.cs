@@ -1,4 +1,4 @@
-// NeuroDustify.Application/Interfaces/IMqttHouseDataService.cs
+// NeuroDustify.Application/Interfaces/IMqttStreetDataService.cs
 // Defines the interface for a service that handles house data received via MQTT.
 // This belongs in the Application layer.
 
@@ -10,13 +10,13 @@ namespace NeuroDustify.Application.Interfaces
 {
     /// <summary>
     /// Defines the contract for a service responsible for receiving and managing
-    /// house data messages from an MQTT broker.
+    /// street data messages from an MQTT broker.
     /// </summary>
-    public interface IMqttHouseDataService
+    public interface IMqttStreetDataService
     {
         /// <summary>
         /// Starts the MQTT client and connects to the broker, initiating the subscription
-        /// to the house data topic. This should run as a background task.
+        /// to the street data topic. This should run as a background task.
         /// </summary>
         /// <returns>A Task representing the asynchronous operation.</returns>
         Task StartAsync();
@@ -28,12 +28,10 @@ namespace NeuroDustify.Application.Interfaces
         Task StopAsync();
 
         /// <summary>
-        /// Retrieves the latest collection of house data messages that have been received
+        /// Retrieves the latest collection of street data messages that have been received
         /// by the service.
         /// </summary>
-        /// <returns>A list of HouseDataMessage objects.</returns>
-        // Note: This returns the raw messages as received. Further processing
-        // (e.g., consolidating updates for the same house ID) would happen
-        // in the Application layer or another service.
-        List<HouseDataMessage> GetLatestMessages();    }
+        /// <returns>A list of StreetDataMessage objects.</returns>
+        List<StreetDataMessage> GetLatestMessages();
+    }
 }
