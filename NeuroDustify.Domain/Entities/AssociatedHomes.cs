@@ -12,18 +12,18 @@ namespace NeuroDustify.Domain.Entities
         /// <summary>
         /// The unique identifier for the property/house.
         /// </summary>
-        public string PropertyId { get; set; }
+        public required string PropertyId { get; set; }
 
         /// <summary>
         /// The street address of the house.
         /// </summary>
-        public string Address { get; set; }
+        public required string Address { get; set; }
 
         /// <summary>
         /// The geographical location of the house.
         /// </summary>
         // Reusing the Location class from the same Domain layer
-        public Location HouseLocation { get; set; }
+        public required Location HouseLocation { get; set; }
 
         // Optional: Add constructors or other methods if needed
     }

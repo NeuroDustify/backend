@@ -9,44 +9,44 @@ using System.Text.Json.Serialization; // Required for [JsonPropertyName] attribu
 namespace NeuroDustify.Domain.Entities
 {
     // Keeping other message types for now, but the primary one for the suburb topic is SuburbDataMessage
-    public class DrivewayMessage
-    {
-        [JsonPropertyName("id")] // Assuming JSON key is "id" or "driveway_id", check your CSV/JSON
-        public string? Id { get; set; }
-        [JsonPropertyName("location")]
-        public Location? Location { get; set; } // Make nullable if location might be missing
-    }
+    // public class DrivewayMessage
+    // {
+    //     [JsonPropertyName("id")] // Assuming JSON key is "id" or "driveway_id", check your CSV/JSON
+    //     public string? Id { get; set; }
+    //     [JsonPropertyName("location")]
+    //     public Location? Location { get; set; } // Make nullable if location might be missing
+    // }
 
-    public class HouseMessage
-    {
-        [JsonPropertyName("property_id")] // Assuming JSON key, check your CSV/JSON
-        public string? PropertyId { get; set; }
-        [JsonPropertyName("address")] // Assuming JSON key
-        public string? Address { get; set; }
-        [JsonPropertyName("location")] // Assuming JSON key
-        public Location? Location { get; set; } // Make nullable if location might be missing
-    }
+    // public class HouseMessage
+    // {
+    //     [JsonPropertyName("property_id")] // Assuming JSON key, check your CSV/JSON
+    //     public string? PropertyId { get; set; }
+    //     [JsonPropertyName("address")] // Assuming JSON key
+    //     public string? Address { get; set; }
+    //     [JsonPropertyName("location")] // Assuming JSON key
+    //     public Location? Location { get; set; } // Make nullable if location might be missing
+    // }
 
-     public class StreetMessage // Assuming this structure is published separately or nested differently
-    {
-        [JsonPropertyName("street_id")] // Assuming JSON key
-        public string? StreetId { get; set; }
-        [JsonPropertyName("name")] // Assuming JSON key
-        public string? Name { get; set; }
-        // Assuming Houses are not directly nested in the street message based on the publisher sending them separately
-        // public List<HouseMessage>? Houses { get; set; }
-    }
+    //  public class StreetMessage // Assuming this structure is published separately or nested differently
+    // {
+    //     [JsonPropertyName("street_id")] // Assuming JSON key
+    //     public string? StreetId { get; set; }
+    //     [JsonPropertyName("name")] // Assuming JSON key
+    //     public string? Name { get; set; }
+    //     // Assuming Houses are not directly nested in the street message based on the publisher sending them separately
+    //     // public List<HouseMessage>? Houses { get; set; }
+    // }
 
-    // This SuburbMessage structure might correspond to a different data feed or model
-    public class SuburbMessage
-    {
-        [JsonPropertyName("suburb_id")] // Assuming JSON key
-        public string? SuburbId { get; set; }
-        [JsonPropertyName("name")] // Assuming JSON key
-        public string? Name { get; set; }
-        // Assuming Streets are not directly nested in this message based on the publisher sending them separately
-        // public List<StreetMessage>? Streets { get; set; }
-    }
+    // // This SuburbMessage structure might correspond to a different data feed or model
+    // public class SuburbMessage
+    // {
+    //     [JsonPropertyName("suburb_id")] // Assuming JSON key
+    //     public string? SuburbId { get; set; }
+    //     [JsonPropertyName("name")] // Assuming JSON key
+    //     public string? Name { get; set; }
+    //     // Assuming Streets are not directly nested in this message based on the publisher sending them separately
+    //     // public List<StreetMessage>? Streets { get; set; }
+    // }
 
 
     /// <summary>
@@ -67,12 +67,6 @@ namespace NeuroDustify.Domain.Entities
         [JsonPropertyName("name")]
         public string? Name { get; set; } // Made nullable
 
-        /// <summary>
-        /// The geographical location of the suburb. Maps to the nested "location" JSON object.
-        /// Added based on Python publisher formatting location data.
-        /// </summary>
-        [JsonPropertyName("location")]
-        public Location? Location { get; set; } // Added Location property, made nullable
 
         /// <summary>
         /// A property potentially holding street identifiers. Maps to "street_ids" in the JSON.
@@ -82,36 +76,29 @@ namespace NeuroDustify.Domain.Entities
         [JsonPropertyName("street_ids")]
         public string? StreetId { get; set; } // Made nullable
 
-        // Add other properties if present in the suburb data JSON
-        // For example:
-        // [JsonPropertyName("population")]
-        // public int? Population { get; set; }
-
-        // You might want to add a Timestamp property here as well to know when the data was received
-        // public DateTime Timestamp { get; set; }
     }
 
     // Keeping the StreetData and HouseData definitions from the other SuburbDataMessage
     // definition in your original file, in case they are used elsewhere or are intended
     // for a different message structure.
 
-     public class StreetData // Assuming this structure is published separately or nested differently
-    {
-        [JsonPropertyName("street_id")] // Assuming JSON key
-        public string? StreetId { get; set; }
-        [JsonPropertyName("name")] // Assuming JSON key
-        public string? Name { get; set; }
-        [JsonPropertyName("houses")] // Assuming JSON key for nested houses
-        public List<HouseData>? Houses { get; set; } // Made nullable
-    }
+    //  public class StreetData // Assuming this structure is published separately or nested differently
+    // {
+    //     [JsonPropertyName("street_id")] // Assuming JSON key
+    //     public string? StreetId { get; set; }
+    //     [JsonPropertyName("name")] // Assuming JSON key
+    //     public string? Name { get; set; }
+    //     [JsonPropertyName("houses")] // Assuming JSON key for nested houses
+    //     public List<HouseData>? Houses { get; set; } // Made nullable
+    // }
 
-    public class HouseData // Assuming this structure is published separately or nested differently
-    {
-         [JsonPropertyName("house_id")] // Assuming JSON key
-         public string? HouseId { get; set; }
-         [JsonPropertyName("address")] // Assuming JSON key
-         public string? Address { get; set; }
-         [JsonPropertyName("location")] // Assuming JSON key
-         public Location? HouseLocation { get; set; } // Made nullable
-    }
+    // public class HouseData // Assuming this structure is published separately or nested differently
+    // {
+    //      [JsonPropertyName("house_id")] // Assuming JSON key
+    //      public string? HouseId { get; set; }
+    //      [JsonPropertyName("address")] // Assuming JSON key
+    //      public string? Address { get; set; }
+    //      [JsonPropertyName("location")] // Assuming JSON key
+    //      public Location? HouseLocation { get; set; } // Made nullable
+    // }
 }

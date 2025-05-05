@@ -67,7 +67,7 @@ namespace NeuroDustify.WebApi.Controllers
 
             // Find the latest message for the specified suburb ID
             var latestSuburbData = allMessages
-                                        .Where(m => m.SuburbId.Equals(suburbId, StringComparison.OrdinalIgnoreCase)) // Filter by Suburb ID (case-insensitive)
+                                        .Where(m => m.SuburbId != null && m.SuburbId.Equals(suburbId, StringComparison.OrdinalIgnoreCase)) // Filter by Suburb ID (case-insensitive)
                                         .LastOrDefault(); // Get the last (latest) one, or null if none found
 
             // Check if data for the specific suburb was found

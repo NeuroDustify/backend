@@ -15,7 +15,7 @@ namespace NeuroDustify.Domain.Entities
         /// <summary>
         /// The unique identifier of the smart bin that sent the message.
         /// </summary>
-        public string BinId { get; set; }
+        public required string BinId { get; set; }
 
         /// <summary>
         /// The timestamp when the data reading was taken by the bin sensor (in UTC).
@@ -28,7 +28,7 @@ namespace NeuroDustify.Domain.Entities
         /// placed at the curb.
         /// </summary>
         // Uses the Location value object defined above
-        public Location Location { get; set; }
+        public required Location Location { get; set; }
 
         /// <summary>
         /// The fill level of the bin, typically expressed as a percentage (0-100).
@@ -39,7 +39,7 @@ namespace NeuroDustify.Domain.Entities
         /// The operational status of the bin at the time of the reading
         /// (e.g., "online", "low battery", "error", "maintenance").
         /// </summary>
-        public string Status { get; set; }
+        public required string Status { get; set; }
 
         /// <summary>
         /// The temperature inside the bin, measured in degrees Celsius.
@@ -52,7 +52,7 @@ namespace NeuroDustify.Domain.Entities
         /// This provides context for where the bin is located.
         /// </summary>
         // Uses the AssociatedHouse entity/value object defined above
-        public AssociatedHouse AssociatedHouse { get; set; }
+        public required AssociatedHouse AssociatedHouse { get; set; }
 
         // Optional: Add methods here representing business logic related to a bin data message,
         // e.g., IsFull(), IsOverheating(), CalculateAge(), ValidateData()
